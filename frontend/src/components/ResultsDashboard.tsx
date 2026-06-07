@@ -78,9 +78,9 @@ export default function ResultsDashboard({ onRestart, initialData, onViewHistory
         <div className="flex items-center gap-4 text-sm">
           <span className="opacity-50 mono hidden sm:inline">v2.4.0-stable</span>
           <div className="h-4 w-[1px] bg-line hidden sm:block"></div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-            <span className="mono">@{data.username}</span>
+          <div className="flex items-center gap-2 max-w-[150px] sm:max-w-[240px]">
+            <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] shrink-0"></span>
+            <span className="mono truncate" title={`@${data.username}`}>@{data.username}</span>
           </div>
         </div>
       </header>
@@ -244,12 +244,12 @@ export default function ResultsDashboard({ onRestart, initialData, onViewHistory
                       onClick={() => onViewHistory(item.data)}
                       className="flex flex-col text-left p-4 bg-bg-card border border-line rounded hover:bg-white/5 active:scale-95 transition-all group"
                     >
-                      <div className="flex justify-between items-center w-full mb-2">
-                        <span className="font-bold mono uppercase tracking-widest text-white">@{item.data.username}</span>
-                        <span className="text-xl font-bold text-accent">{item.data.score}<span className="text-xs text-white/40">/100</span></span>
+                      <div className="flex justify-between items-center w-full mb-2 gap-2 overflow-hidden">
+                        <span className="font-bold mono uppercase tracking-widest text-white truncate flex-1" title={`@${item.data.username}`}>@{item.data.username}</span>
+                        <span className="text-xl font-bold text-accent shrink-0">{item.data.score}<span className="text-xs text-white/40">/100</span></span>
                       </div>
-                      <div className="flex justify-between items-center w-full">
-                        <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-white/50">{item.data.tier}</span>
+                      <div className="flex justify-between items-center w-full gap-2">
+                        <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-white/50 truncate flex-1">{item.data.tier}</span>
                         <span className="text-xs serif italic opacity-50">{new Date(item.date).toLocaleDateString()}</span>
                       </div>
                     </button>

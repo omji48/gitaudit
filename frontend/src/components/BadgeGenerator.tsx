@@ -78,8 +78,17 @@ export default function BadgeGenerator({ scoreData }: { scoreData: AuditResult }
 
     // 2. Username Pill Badge
     ctx.font = 'bold 11px monospace';
-    const usernameStr = `@${scoreData.username}`;
-    const usernameWidth = ctx.measureText(usernameStr).width;
+    let usernameStr = `@${scoreData.username}`;
+    let usernameWidth = ctx.measureText(usernameStr).width;
+    
+    // If username is too long for the left panel, truncate it to fit within 180px
+    if (usernameWidth > 180) {
+      while (usernameWidth > 170 && usernameStr.length > 5) {
+        usernameStr = usernameStr.slice(0, -1);
+        usernameWidth = ctx.measureText(usernameStr + '...').width;
+      }
+      usernameStr = usernameStr + '...';
+    }
     
     ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.strokeStyle = 'rgba(142, 117, 68, 0.3)';
@@ -97,6 +106,7 @@ export default function BadgeGenerator({ scoreData }: { scoreData: AuditResult }
     // Username text
     ctx.fillStyle = '#e2d9c8';
     ctx.fillText(usernameStr, 64, 100);
+
 
     // 3. Large Score Number & /100
     ctx.fillStyle = '#e2d9c8';
