@@ -125,22 +125,32 @@ export default function BadgeGenerator({ scoreData }: { scoreData: AuditResult }
 
     // 5. Skills Tags (gold borders)
     let skillX = 40;
+    let skillY = 282;
     const skills = (scoreData.skills || []).slice(0, 3);
     skills.forEach((skill) => {
       ctx.font = 'bold 9px system-ui, -apple-system, sans-serif';
       const skillText = skill.toUpperCase();
       const skillWidth = ctx.measureText(skillText).width;
+      const tagWidth = skillWidth + 16;
+
+      // If drawing this tag would overflow the left panel boundary (panelX = 278, leaving a safety margin),
+      // wrap it to a second row.
+      if (skillX + tagWidth > 268) {
+        skillX = 40;
+        skillY += 26; // Move to the next row (height 20 + 6px spacing)
+      }
 
       ctx.strokeStyle = 'rgba(142, 117, 68, 0.2)';
       ctx.lineWidth = 1;
-      drawRoundedRect(ctx, skillX, 282, skillWidth + 16, 20, 4);
+      drawRoundedRect(ctx, skillX, skillY, tagWidth, 20, 4);
       ctx.stroke();
 
       ctx.fillStyle = '#c2b9a7';
-      ctx.fillText(skillText, skillX + 8, 295);
+      ctx.fillText(skillText, skillX + 8, skillY + 13);
 
-      skillX += skillWidth + 24;
+      skillX += tagWidth + 8; // 8px spacing between tags
     });
+
 
     // 6. Right Side Panel Box
     const panelX = 278;
