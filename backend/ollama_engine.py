@@ -110,7 +110,7 @@ def safe_json_parse(text):
     return None
 
 
-def ollama_chat(base_url, model, system_prompt, user_payload):
+def ollama_chat(base_url, model, system_prompt, user_payload, save_debug=False):
     # Determine if we use OpenAI-compatible completions endpoint or native Ollama chat
     is_openai_format = "/v1" in base_url
     if is_openai_format:
@@ -168,25 +168,50 @@ def ollama_chat(base_url, model, system_prompt, user_payload):
         print(f"DEBUG safe_json_parse failed for content: {repr(content)}")
     else:
         print(f"DEBUG safe_json_parse succeeded: keys {list(parsed.keys())}")
+
+    # Write the raw Ollama response for the first batch to data/ollama_debug.json for inspection
+    if save_debug:
+        try:
+            os.makedirs("data", exist_ok=True)
+            debug_info = {
+                "raw_response_body": body,
+                "raw_content_string": content,
+                "parsed_json": parsed
+            }
+            with open(os.path.join("data", "ollama_debug.json"), "w", encoding="utf-8") as df:
+                json.dump(debug_info, df, ensure_ascii=False, indent=2)
+            print("DEBUG wrote data/ollama_debug.json successfully")
+        except Exception as ex:
+            print(f"DEBUG failed to write data/ollama_debug.json: {ex}")
+
     return parsed
 
 
 def build_llm_input(profile_data, batch_repos):
+    # Verify profile-level fields are fully populated and sent in every batch.
+    # If any fields are missing, we fallback to defaults to prevent context loss.
     profile_subset = {
-        "username": profile_data.get("username"),
-        "name": profile_data.get("name"),
-        "bio": profile_data.get("bio"),
-        "followers": profile_data.get("followers"),
-        "following": profile_data.get("following"),
-        "account_age_days": profile_data.get("account_age_days"),
-        "total_contributions_365": profile_data.get("total_contributions_365"),
-        "longest_streak": profile_data.get("longest_streak"),
-        "current_streak": profile_data.get("current_streak"),
-        "pinned_repos": profile_data.get("pinned_repos"),
+        "username": profile_data.get("username") or "unknown",
+        "name": profile_data.get("name") or "",
+        "bio": profile_data.get("bio") or "",
+        "followers": profile_data.get("followers") or 0,
+        "following": profile_data.get("following") or 0,
+        "account_age_days": profile_data.get("account_age_days") or 0,
+        "total_contributions_365": profile_data.get("total_contributions_365") or 0,
+        "longest_streak": profile_data.get("longest_streak") or 0,
+        "current_streak": profile_data.get("current_streak") or 0,
+        "pinned_repos": profile_data.get("pinned_repos") or [],
     }
 
     repos_subset = []
     for r in batch_repos:
+        readme_content = r.get("readme") or ""
+        # READMEs can be very long. Truncate README content to 1500 characters
+        # if it exceeds 1500 chars to avoid exceeding LLM context limits, token bloat,
+        # and request timeouts.
+        if len(readme_content) > 1500:
+            readme_content = readme_content[:1500] + "... [TRUNCATED]"
+
         repos_subset.append(
             {
                 "name": r.get("name"),
@@ -198,7 +223,7 @@ def build_llm_input(profile_data, batch_repos):
                 "last_pushed_days_ago": r.get("last_pushed_days_ago"),
                 "is_fork": r.get("is_fork"),
                 "size_kb": r.get("size_kb"),
-                "readme": r.get("readme") or "",
+                "readme": readme_content,
                 "commits_last_12_months": r.get("commits_last_12_months"),
             }
         )
@@ -255,6 +280,7 @@ def analyze_profile():
             model=ollama_model,
             system_prompt=SYSTEM_PROMPT,
             user_payload=llm_input,
+            save_debug=(batch_idx == 0)
         )
 
         if not isinstance(analysis, dict):
