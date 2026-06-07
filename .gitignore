@@ -1,0 +1,33 @@
+# Credentials and environment secrets
+.env
+.env.*
+secrets.json
+
+# Local database / audit results
+data/
+backend/data/
+*.json.bak
+
+# Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
+
+# Frontend builds and dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+frontend/build/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.local

@@ -1,0 +1,6 @@
+{
+  "name": "GitAudit Dashboard",
+  "description": "A dashboard for auditing GitHub profiles and assigning a score and tier.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

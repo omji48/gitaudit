@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #A855F7;
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-bg-card: #141414;
+  --color-app-bg: #0A0A0A;
+  --color-app-text: #E0E0E0;
+  
+  --font-serif: "Georgia", serif;
+  --font-mono: "Courier New", Courier, monospace;
+}
+
+@layer utilities {
+  .score-circle {
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+    border: 2px solid var(--color-accent);
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
+  }
+  .dimension-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    border-radius: 3px;
+  }
+  .dimension-fill {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 3px;
+  }
+  .repo-card {
+    background: var(--color-bg-card);
+    border-left: 3px solid var(--color-accent);
+  }
+}
+
